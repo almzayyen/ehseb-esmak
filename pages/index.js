@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { calculateWordSum, letterValues } from '../lib/mapping.js';
+import { calculateWordSum, letterValues, orderedLetterPairs } from '../lib/mapping.js';
 
 export default function Home() {
   const [word, setWord] = useState('');
@@ -22,8 +22,9 @@ export default function Home() {
   const header = lang === 'ar' ? 'حاسبة مجموع الحروف العربية' : 'Arabic Letter Sum Calculator';
   const placeholder = lang === 'ar' ? 'أدخل كلمة عربية' : 'Enter Arabic word';
   const buttonText = lang === 'ar' ? 'احسب المجموع' : 'Compute Sum';
-  const sumLabel = lang === 'ar' ? 'المجموع:' : 'Sum:';
+  const sumLabel = lang === 'ar' ? 'المجموع:' : 'Sum:'; 
   const mappingHeader = lang === 'ar' ? 'المطابقة: قيم الحروف العربية' : 'Mapping: Arabic letter values';
+  const toggleLabel = lang === 'ar' ? 'English' : 'العربية';
 
   const styles = {
     container: {
@@ -38,7 +39,6 @@ export default function Home() {
       marginBottom: '1rem'
     },
     layout: {
-      display: 'flex',
       gap: '2rem',
       alignItems: 'start'
     },
@@ -52,24 +52,33 @@ export default function Home() {
     mapItem: { padding: '6px 8px', borderRadius: '4px', background: '#f7f7f7', border: '1px solid #eee', textAlign: 'center', fontSize: '0.95rem' }
   };
 
-  const mappingEntries = Object.entries(letterValues).filter(([k]) => k.length === 1).sort((a,b)=> a[0].localeCompare(b[0]));
+  // Use ordered letters sorted by numeric value
+  const mappingEntries = orderedLetterPairs; // [char, value] pairs
 
   return (
     <div style={styles.container}>
       <div style={{ position: 'fixed', top: 12, right: 12 }}>
         <button onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')} style={{ padding: '6px 10px', borderRadius: '6px', border: '1px solid #ccc', background: '#fff' }}>
-          {lang === 'ar' ? 'English' : 'العربية'}
+          {toggleLabel}
         </button>
       </div>
-      <h1 style={styles.header}>{header}</h1>
-      <div style={styles.layout}>
+      <style jsx>{`
+        .layout { display: flex; }
+        @media (max-width: 800px) {
+          .layout { flex-direction: column; }
+          .mapping-grid { grid-template-columns: repeat(2, 1fr); }
+          .input, .button { width: 100%; }
+        }
+      `}</style>
+      <h1 className={"header"} style={styles.header}>{header}</h1>
+      <div className={"layout"} style={styles.layout}>
         <div style={styles.left}>
           <div style={{ marginBottom: '0.75rem', color: '#2e7d32', fontWeight: 'bold' }}>
-            {lang === 'ar' ? 'الرجاء إدخال كلمة عربية للحساب' : 'Enter an Arabic word to compute its sum'}
+            {lang === 'ar' ? ' الرجاء إدخال كلمة عربية للحساب' : 'Enter an Arabic word to compute its sum'}
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            <input value={word} onChange={(e) => setWord(e.target.value)} placeholder={placeholder} onKeyDown={(e) => { if (e.key === 'Enter') computeSum(); }} style={styles.input} />
-            <button onClick={computeSum} style={styles.button}>{buttonText}</button>
+            <input className="input" value={word} onChange={(e) => setWord(e.target.value)} placeholder={placeholder} onKeyDown={(e) => { if (e.key === 'Enter') computeSum(); }} style={styles.input} />
+            <button className="button" onClick={computeSum} style={styles.button}>{buttonText}</button>
             {typeof sum === 'number' && (
               <div style={styles.sum}>{sumLabel} {sum}</div>
             )}
@@ -78,7 +87,7 @@ export default function Home() {
             )}
           </div>
         </div>
-        <div style={styles.right}>
+        <div className={"mapping-grid"} style={styles.right}>
           <div style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>{mappingHeader}</div>
           <div style={styles.mappingGrid}>
             {mappingEntries.map(([ch, val]) => (

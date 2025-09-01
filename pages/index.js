@@ -39,7 +39,6 @@ export default function Home() {
       marginBottom: '1rem'
     },
     layout: {
-      display: 'flex',
       gap: '2rem',
       alignItems: 'start'
     },
@@ -63,15 +62,23 @@ export default function Home() {
           {toggleLabel}
         </button>
       </div>
-      <h1 style={styles.header}>{header}</h1>
-      <div style={styles.layout}>
+      <style jsx>{`
+        .layout { display: flex; }
+        @media (max-width: 800px) {
+          .layout { flex-direction: column; }
+          .mapping-grid { grid-template-columns: repeat(2, 1fr); }
+          .input, .button { width: 100%; }
+        }
+      `}</style>
+      <h1 className={"header"} style={styles.header}>{header}</h1>
+      <div className={"layout"} style={styles.layout}>
         <div style={styles.left}>
           <div style={{ marginBottom: '0.75rem', color: '#2e7d32', fontWeight: 'bold' }}>
             {lang === 'ar' ? ' الرجاء إدخال كلمة عربية للحساب' : 'Enter an Arabic word to compute its sum'}
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            <input value={word} onChange={(e) => setWord(e.target.value)} placeholder={placeholder} onKeyDown={(e) => { if (e.key === 'Enter') computeSum(); }} style={styles.input} />
-            <button onClick={computeSum} style={styles.button}>{buttonText}</button>
+            <input className="input" value={word} onChange={(e) => setWord(e.target.value)} placeholder={placeholder} onKeyDown={(e) => { if (e.key === 'Enter') computeSum(); }} style={styles.input} />
+            <button className="button" onClick={computeSum} style={styles.button}>{buttonText}</button>
             {typeof sum === 'number' && (
               <div style={styles.sum}>{sumLabel} {sum}</div>
             )}
@@ -80,7 +87,7 @@ export default function Home() {
             )}
           </div>
         </div>
-        <div style={styles.right}>
+        <div className={"mapping-grid"} style={styles.right}>
           <div style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>{mappingHeader}</div>
           <div style={styles.mappingGrid}>
             {mappingEntries.map(([ch, val]) => (
